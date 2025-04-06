@@ -82,3 +82,8 @@ cardFormElement.addEventListener('submit', function (evt) {
     handleCardFormSubmit(evt);
     closeModal(cardPopup);
 });
+
+const cardLikeButton = document.querySelector('.card__like-button');
+cardLikeButton.addEventListener('click', function () {
+   cardLikeButton.classList.toggle('card__like-button_is-active');
+});
