@@ -2,6 +2,10 @@ const profilePopup = document.querySelector('.popup_type_edit');
 const cardPopup = document.querySelector('.popup_type_new-card');
 const imagePopup = document.querySelector('.popup_type_image');
 
+profilePopup.classList.add('popup_is-animated');
+cardPopup.classList.add('popup_is-animated');
+imagePopup.classList.add('popup_is-animated');
+
 function openModal(popup) {      
     popup.classList.add('popup_is-opened');
 };
@@ -69,8 +73,31 @@ function handleCardFormSubmit(evt) {
     function createCard() {
         const cardTempalte = document.querySelector('#card-template').content;
         const cardElement = cardTempalte.querySelector('.card').cloneNode(true);
+
         cardElement.querySelector('.card__image').src = url;
+        cardElement.querySelector('.card__image').alt = text;
         cardElement.querySelector('.card__description').querySelector('.card__title').textContent = text;
+
+        const cardDeleteButton = cardElement.querySelector('.card__delete-button')
+        cardDeleteButton.addEventListener('click', function (evt) {
+            evt.target.closest('.card').remove();
+        });
+
+        const cardLikeButton = cardElement.querySelector('.card__like-button')
+        cardLikeButton.addEventListener('click', function (evt) {
+            evt.target.classList.toggle('card__like-button_is-active');
+        });
+
+        const imageOpenButton = cardElement.querySelector('.card__image');
+
+        imageOpenButton.addEventListener('click', function (evt) {
+            image = imagePopup.querySelector('.popup__image');
+            image.src = evt.target.src;
+            image.alt = evt.target.alt;
+            imagePopup.querySelector('.popup__caption').textContent = evt.target.alt;
+            openModal(imagePopup);
+        });
+
         return cardElement;
     };
     
@@ -83,11 +110,7 @@ cardFormElement.addEventListener('submit', function (evt) {
     closeModal(cardPopup);
 });
 
-document.querySelector('.places__list').addEventListener('click', function(evt) {
-    if (evt.target.classList.contains('card__delete-button')) {
-        evt.target.closest('.card').remove();
-    }
-    else if (evt.target.classList.contains('card__like-button')) {
-        evt.target.classList.toggle('card__like-button_is-active');
-    }
+const popupImageCloseButton = imagePopup.querySelector('.popup__close');
+popupImageCloseButton.addEventListener('click', function () {
+    closeModal(imagePopup);
 });
