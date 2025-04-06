@@ -83,7 +83,11 @@ cardFormElement.addEventListener('submit', function (evt) {
     closeModal(cardPopup);
 });
 
-const cardLikeButton = document.querySelector('.card__like-button');
-cardLikeButton.addEventListener('click', function () {
-   cardLikeButton.classList.toggle('card__like-button_is-active');
+document.querySelector('.places__list').addEventListener('click', function(evt) {
+    if (evt.target.classList.contains('card__delete-button')) {
+        evt.target.closest('.card').remove();
+    }
+    else if (evt.target.classList.contains('card__like-button')) {
+        evt.target.classList.toggle('card__like-button_is-active');
+    }
 });
