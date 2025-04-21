@@ -6,19 +6,24 @@ profilePopup.classList.add('popup_is-animated');
 cardPopup.classList.add('popup_is-animated');
 imagePopup.classList.add('popup_is-animated');
 
-function openModal(popup) {      
+function openModal(popup) {
+    document.addEventListener('keydown', escHandler);
+    document.addEventListener('click', clickHandler);
     popup.classList.add('popup_is-opened');
 };
 
 function closeModal(popup) {      
+    document.removeEventListener('keydown', escHandler);
+    document.removeEventListener('click', clickHandler);
     popup.classList.remove('popup_is-opened');
 };
 
 const profileEditButton = document.querySelector('.profile__edit-button');
-profileEditButton.addEventListener('click', function () {
+profileEditButton.addEventListener('click', function (evt) {
     profilePopup.querySelector('.popup__input_type_name').value = document.querySelector('.profile__title').textContent;
     profilePopup.querySelector('.popup__input_type_description').value = document.querySelector('.profile__description').textContent;
     openModal(profilePopup);
+    evt.stopPropagation();
 });
 
 const popupProfileCloseButton = profilePopup.querySelector('.popup__close');
@@ -50,8 +55,9 @@ profileFormElement.addEventListener('submit', function (evt) {
 });
 
 const cardAddButton = document.querySelector('.profile__add-button');
-cardAddButton.addEventListener('click', function () {
+cardAddButton.addEventListener('click', function (evt) {
     openModal(cardPopup);
+    evt.stopPropagation();
 });
 
 const popupCardProfileCloseButton = cardPopup.querySelector('.popup__close');
@@ -89,13 +95,13 @@ function handleCardFormSubmit(evt) {
         });
 
         const imageOpenButton = cardElement.querySelector('.card__image');
-
         imageOpenButton.addEventListener('click', function (evt) {
             image = imagePopup.querySelector('.popup__image');
             image.src = evt.target.src;
             image.alt = evt.target.alt;
             imagePopup.querySelector('.popup__caption').textContent = evt.target.alt;
             openModal(imagePopup);
+            evt.stopPropagation();
         });
 
         return cardElement;
@@ -115,66 +121,94 @@ popupImageCloseButton.addEventListener('click', function () {
     closeModal(imagePopup);
 });
 
+// ------------------------------------------------------------------------------------------------------
 
 const showInputError = (formElement, inputElement, errorMessage) => {
     const errorElement = formElement.querySelector(`.${inputElement.id}-error`);
     inputElement.classList.add('popup__input_type_error');
     errorElement.textContent = errorMessage;
     errorElement.classList.add('popup__input-error_active');
-  };
-  
-  const hideInputError = (formElement, inputElement) => {
+};
+
+const hideInputError = (formElement, inputElement) => {
     const errorElement = formElement.querySelector(`.${inputElement.id}-error`);
     inputElement.classList.remove('popup__input_type_error');
     errorElement.classList.remove('popup__input-error_active');
     errorElement.textContent = '';
-  };
-  
-  const checkInputValidity = (formElement, inputElement) => {
+};
+
+const checkInputValidity = (formElement, inputElement) => {
     if (!inputElement.validity.valid) {
-      showInputError(formElement, inputElement, inputElement.validationMessage);
+        showInputError(formElement, inputElement, inputElement.validationMessage);
     } else {
-      hideInputError(formElement, inputElement);
+        hideInputError(formElement, inputElement);
     }
-  };
-  
-  const setEventListeners = (formElement) => {
+};
+
+const setEventListeners = (formElement) => {
     const inputList = Array.from(formElement.querySelectorAll('.popup__input'));
     const buttonElement = formElement.querySelector('.popup__button');
     toggleButtonState(inputList, buttonElement);
     inputList.forEach((inputElement) => {
-      inputElement.addEventListener('input', function () {
+        inputElement.addEventListener('input', function () {
         checkInputValidity(formElement, inputElement);
         toggleButtonState(inputList, buttonElement);
-      });
+        });
     });
-  };
-  
-  const enableValidation = () => {
+};
+
+const enableValidation = () => {
     const formList = Array.from(document.querySelectorAll('[class$="form"]'));
     formList.forEach((formElement) => {
-      formElement.addEventListener('submit', function (evt) {
+        formElement.addEventListener('submit', function (evt) {
         evt.preventDefault();
-      });
-      setEventListeners(formElement);
+        });
+        setEventListeners(formElement);
     });
-  };
-  
-  const hasInvalidInput = (inputList) => {
-    return inputList.some((inputElement) => {
-      return !inputElement.validity.valid;
-    });
-  };
-  
-  const toggleButtonState = (inputList, buttonElement) => {
-    if (hasInvalidInput(inputList)) {
-      buttonElement.classList.add('popup__button_inactive');
-      buttonElement.setAttribute('disabled', true);
-    } else {
-      buttonElement.classList.remove('popup__button_inactive');
-      buttonElement.removeAttribute('disabled', true);
-    }
-  };
+};
 
-  enableValidation();
+const hasInvalidInput = (inputList) => {
+    return inputList.some((inputElement) => {
+        return !inputElement.validity.valid;
+    });
+};
+
+const toggleButtonState = (inputList, buttonElement) => {
+    if (hasInvalidInput(inputList)) {
+        buttonElement.classList.add('popup__button_inactive');
+        buttonElement.setAttribute('disabled', true);
+    } else {
+        buttonElement.classList.remove('popup__button_inactive');
+        buttonElement.removeAttribute('disabled', true);
+    }
+};
+
+enableValidation();
   
+// ------------------------------------------------------------------------------------------------------
+
+const clickHandler = (evt) => {
+    const overlay = document.querySelector('.popup_is-opened');
+    if (overlay) {
+        overlayElement = overlay.querySelector('.popup__content');
+    } else {
+        return null;
+    }
+
+    if (evt.target.classList.contains('card__image')) {
+        return null;
+    }
+
+    if (!overlayElement.contains(evt.target)) {
+        closeModal(overlay);
+    }
+};
+
+const escHandler = (evt) => {
+    if (evt.key === 'Escape') {
+        const overlay = document.querySelector('.popup_is-opened');
+        if (overlay) {
+            closeModal(overlay);
+        }
+    }
+};
