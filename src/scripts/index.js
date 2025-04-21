@@ -192,11 +192,7 @@ const clickHandler = (evt) => {
     if (overlay) {
         overlayElement = overlay.querySelector('.popup__content');
     } else {
-        return null;
-    }
-
-    if (evt.target.classList.contains('card__image')) {
-        return null;
+        return;
     }
 
     if (!overlayElement.contains(evt.target)) {

@@ -25,6 +25,40 @@ const initialCards = [
     }
 ];
 
+const clickHandler = (evt) => {
+  const overlay = document.querySelector('.popup_is-opened');
+  if (overlay) {
+      overlayElement = overlay.querySelector('.popup__content');
+  } else {
+      return;
+  }
+
+  if (!overlayElement.contains(evt.target)) {
+      closeModal(overlay);
+  }
+};
+
+const escHandler = (evt) => {
+  if (evt.key === 'Escape') {
+      const overlay = document.querySelector('.popup_is-opened');
+      if (overlay) {
+          closeModal(overlay);
+      }
+  }
+};
+
+function openModal(popup) {
+  document.addEventListener('keydown', escHandler);
+  document.addEventListener('click', clickHandler);
+  popup.classList.add('popup_is-opened');
+};
+
+function closeModal(popup) {      
+  document.removeEventListener('keydown', escHandler);
+  document.removeEventListener('click', clickHandler);
+  popup.classList.remove('popup_is-opened');
+};
+
 function createCard(card) {
   const cardTempalte = document.querySelector('#card-template').content;
   const cardElement = cardTempalte.querySelector('.card').cloneNode(true);
@@ -45,11 +79,13 @@ function createCard(card) {
 
   const imageOpenButton = cardElement.querySelector('.card__image');
   imageOpenButton.addEventListener('click', function (evt) {
-      image = imagePopup.querySelector('.popup__image');
+      const imagePopup = document.querySelector('.popup_type_image')
+      let image = imagePopup.querySelector('.popup__image');
       image.src = evt.target.src;
       image.alt = evt.target.alt;
       imagePopup.querySelector('.popup__caption').textContent = evt.target.alt;
       openModal(imagePopup);
+      evt.stopPropagation();
   });
 
   return cardElement;
