@@ -33,7 +33,6 @@
     "webpack-dev-server": "^5.2.1"
   },
   "dependencies": {
-    "copy-webpack-plugin": "^13.0.0",
     "core-js": "^3.41.0"
   }
 }
