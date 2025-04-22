@@ -33,7 +33,7 @@ const handleProfileFormSubmit = (evt) => {
 const cardImage = (cardElement) => {
     const imageOpenButton = cardElement.querySelector('.card__image');
     imageOpenButton.addEventListener('click', (evt) => {
-        let image = imagePopup.querySelector('.popup__image');
+        const image = imagePopup.querySelector('.popup__image');
         image.src = evt.target.src;
         image.alt = evt.target.alt;
         imagePopup.querySelector('.popup__caption').textContent = evt.target.alt;
