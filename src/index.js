@@ -7,27 +7,36 @@ import './images/delete-icon.svg';
 import './images/close.svg';
 import './images/add-icon.svg';
 import './images/edit-icon.svg';
-import './images/avatar.jpg';
-import './images/card_1.jpg';
-import './images/card_2.jpg';
-import './images/card_3.jpg';
 
-import { initialCards } from './components/cards.js';
 import { cardDelete, cardLike, createCard } from './components/card.js';
 import { openModal, closeModal } from './components/modal.js';
 import { enableValidation } from './components/validate.js';
+import { getProfile, getCards, editProfile, addCard } from './components/api.js';
+
 
 const handleProfileFormSubmit = (evt) => {
     evt.preventDefault();
 
     const name = nameInput.value;
-    const job = jobInput.value;
+    const about = jobInput.value;
 
-    const title = document.querySelector('.profile__title');
-    const description = document.querySelector('.profile__description')
+    editProfile(name, about)
+        .then((res) => {
+            if (res.ok) {
+                return res.json();
+            }
 
-    title.textContent = name;
-    description.textContent = job;
+            return Promise.reject(res.status);
+        })
+        .then(() => {
+            const title = document.querySelector('.profile__title');
+            const description = document.querySelector('.profile__description')
+            title.textContent = name;
+            description.textContent = about; 
+        })
+        .catch((err) => {
+            console.log(`Error ${err}`);
+        });
 };
 
 const cardImage = (cardElement) => {
@@ -48,21 +57,34 @@ const handleCardFormSubmit = (evt) => {
     const name = textInput.value;
     const link = urlInput.value;
 
-    const cardElement = createCard(name, link);
-    cardDelete(cardElement);
-    cardLike(cardElement);
-    cardImage(cardElement);
-    
-    const placesList = document.querySelector('.places__list');
-    placesList.prepend(cardElement);      
+    addCard(name, link)
+        .then((res) => {
+            if (res.ok) {
+                return res.json();
+            }
+
+            return Promise.reject(res.status);
+        })
+        .then((res) => {
+            const cardElement = createCard(name, link, res.likes.length);
+            cardDelete(cardElement);
+            cardLike(cardElement, res._id, userId, res.likes);
+            cardImage(cardElement);
+            
+            const placesList = document.querySelector('.places__list');
+            placesList.prepend(cardElement); 
+        })
+        .catch((err) => {
+            console.log(`Error ${err}`);
+        });
 };
 
 const addCards = (cardsList) => {
     const placesList = document.querySelector('.places__list');
     cardsList.forEach((card) => {
-        const cardElement = createCard(card.name, card.link);
-        cardDelete(cardElement);
-        cardLike(cardElement);
+        const cardElement = createCard(card.name, card.link, card.likes.length);
+        cardDelete(cardElement, card._id, userId, card.owner._id);
+        cardLike(cardElement, card._id, userId, card.likes);
         cardImage(cardElement);
         placesList.append(cardElement);
     });
@@ -123,5 +145,40 @@ popupImageCloseButton.addEventListener('click', () => {
     closeModal(imagePopup);
 });
 
-addCards(initialCards);
+const profile = document.querySelector('.profile');
+let userId;
+getProfile()
+    .then((res) => {
+        if (res.ok) {
+            return res.json();
+        }
+        return Promise.reject(res.status);
+    })
+    .then((res) => {
+        profile.querySelector('.profile__image').setAttribute(
+            'style',
+            `background-image: url(${res.avatar});`
+        );
+        profile.querySelector('.profile__title').textContent = res.name;
+        profile.querySelector('.profile__description').textContent = res.about;
+        userId = res._id;
+    })
+    .catch((err) => {
+        console.log(`Error ${err}`);
+    });
+
+getCards()
+    .then((res) => {
+        if (res.ok) {
+            return res.json();
+        }
+        return Promise.reject(res.status);
+    })
+    .then((res) => {
+        addCards(res);
+    })
+    .catch((err) => {
+        console.log(`Error ${err}`);
+    });
+
 enableValidation();
