@@ -1,0 +1,13 @@
+.profile__image__edit-button {
+    position: absolute;
+    left: 47px;
+    top: 47px;
+    width: 26px;
+    height: 26px;
+    opacity: 0;
+    -webkit-transition: 0.3s;
+    -moz-transition: 0.3s;
+    -ms-transition: 0.3s;
+    -o-transition: 0.3s;
+    transition: 0.3s;
+}

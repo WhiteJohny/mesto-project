@@ -1,7 +1,8 @@
 const clickHandler = (evt) => {
     const overlay = document.querySelector('.popup_is-opened');
+
     if (!overlay) return;
-    
+
     const overlayElement = overlay.querySelector('.popup__content');
     if (!overlayElement) return;
 
